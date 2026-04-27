@@ -29,7 +29,14 @@ def scrape_maya_reports(url: str, headless: bool = False):
     try:
         # Note: If you encounter Version mismatch errors locally, you might need to add:
         # driver = uc.Chrome(options=options, version_main=YOUR_CHROME_VERSION)
-        driver = uc.Chrome(options=options)
+        try:
+            driver = uc.Chrome(options=options)
+        except Exception as e:
+            if "version" in str(e).lower():
+                print("Warning: Chrome version mismatch. Trying with version_main=145.")
+                driver = uc.Chrome(options=options, version_main=145)
+            else:
+                raise e
 
         print(f"Navigating to {url}...")
         driver.get(url)
@@ -141,7 +148,14 @@ def scrape_report_content(report_url: str, headless: bool = False):
         options.add_argument("--disable-dev-shm-usage")
 
     try:
-        driver = uc.Chrome(options=options)
+        try:
+            driver = uc.Chrome(options=options)
+        except Exception as e:
+            if "version" in str(e).lower():
+                print("Warning: Chrome version mismatch. Trying with version_main=145.")
+                driver = uc.Chrome(options=options, version_main=145)
+            else:
+                raise e
         driver.get(report_url)
         time.sleep(5)
 
