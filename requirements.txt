@@ -5,3 +5,4 @@ google-genai==1.73.1
 SQLAlchemy==2.0.49
 psycopg2-binary==2.9.12
 jupyter==1.1.1
+requests==2.33.1
