@@ -79,3 +79,43 @@ if __name__ == "__main__":
     if df is not None:
         print("Bank Leumi 5-day history:")
         print(df)
+
+
+def get_symbol_to_id_mapping() -> dict:
+    """
+    Scrapes the Globes website to generate a mapping between the TASE company
+    name/symbol and its official instrument ID (stock number).
+
+    Returns:
+        dict: A dictionary mapping company names to their instrument ID number.
+    """
+    import requests
+    from bs4 import BeautifulSoup
+    import re
+
+    url = "https://www.globes.co.il/portal/quotes/"
+    headers = {"User-Agent": "Mozilla/5.0"}
+    mapping = {}
+
+    try:
+        res = requests.get(url, headers=headers)
+        soup = BeautifulSoup(res.text, "html.parser")
+
+        links = soup.find_all(
+            "a", href=re.compile(r"/portal/instrument\.aspx\?instrumentid=")
+        )
+
+        for link in links:
+            href = link["href"]
+            name = link.text.strip()
+
+            # Extract number
+            match = re.search(r"instrumentid=(\d+)", href)
+            if match and name and 'ת"א' not in name and "מדד" not in name:
+                num = match.group(1)
+                mapping[name] = num
+
+    except Exception as e:
+        print(f"Error generating mapping: {e}")
+
+    return mapping
